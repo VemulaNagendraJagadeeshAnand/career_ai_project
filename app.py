@@ -1,4 +1,5 @@
 import io
+import os
 import docx
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, session, url_for
@@ -6,15 +7,20 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from pdfminer.high_level import extract_text
 from pymongo import MongoClient
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "career_ai_jntuk_project"
+app.secret_key = os.getenv("SECRET_KEY", "career_ai_jntuk_project")
 
 # ---------------- MONGODB ATLAS CLOUD CONFIGURATION ----------------
-# Connection URI for career_ai_database with stable cloud timeouts
-uri = "mongodb+srv://226m1a05a4_db_user:JagadeeshAnand@career.cjjjztp.mongodb.net/?retryWrites=true&w=majority&appName=career&connectTimeoutMS=30000&socketTimeoutMS=30000"
+# Use environment variable for the URI to fix the security vulnerability
+uri = os.getenv("MONGO_URI")
 
 try:
+    # Adding TLS configurations often required for cloud deployment
     client = MongoClient(uri, serverSelectionTimeoutMS=30000)
     db = client["career_ai_database"]
     students_col = db["students"]
@@ -68,8 +74,6 @@ def get_scores(text):
     scores = {career: round(similarity[i] * 100, 2) for i, career in enumerate(CAREERS.keys())}
     return dict(sorted(scores.items(), key=lambda x: x[1], reverse=True))
 
-
-
 def extract_text_from_file(file):
     """Robust extraction logic to prevent PDF reading errors"""
     filename = file.filename.lower()
@@ -116,11 +120,7 @@ def register():
     if request.method == "POST":
         u, e, p, i = request.form["username"], request.form["email"], request.form["password"], request.form["interest"]
         if students_col.find_one({"username": u}): return "User already exists!"
-        
-        # Initialize with empty history array for the Admin Chart distribution
         students_col.insert_one({"username": u, "email": e, "password": p, "interest": i, "history": []})
-        
-        # FIX: Redirect to login after successful registration
         return redirect(url_for("login"))
     return render_template("register.html")
 
@@ -149,7 +149,6 @@ def resume_screening():
                 scores = get_scores(text)
                 best_career, best_score = list(scores.items())[0]
                 
-                # word_count fix for the frontend report
                 word_count = len(text.split())
                 ats_bonus = 15 if (200 < word_count < 700) else 5
                 ats_score = min(100, (best_score * 0.85) + ats_bonus)
@@ -162,7 +161,6 @@ def resume_screening():
                     "word_count": word_count 
                 }
                 
-                # Push results to student's history in MongoDB Atlas
                 students_col.update_one(
                     {"username": session["user"]}, 
                     {"$push": {"history": {
@@ -181,7 +179,6 @@ def admin():
     total_users = students_col.count_documents({})
     all_users = list(students_col.find({}, {"history": 1}))
     
-    # FIX: Live aggregation for Career Recommendation Distribution chart
     career_distribution = {career: 0 for career in CAREERS.keys()}
     total_screenings = 0
     
