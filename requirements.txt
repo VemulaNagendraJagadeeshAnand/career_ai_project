@@ -1,0 +1,7 @@
+flask
+scikit-learn
+pdfminer.six
+python-docx
+pymongo
+pandas
+python-dotenv

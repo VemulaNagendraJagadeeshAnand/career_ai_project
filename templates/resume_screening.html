@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Screening - CareerPath AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        /* Matching Career Guidance Hero Section */
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        /* Analysis Results Styling */
+        
+        .ats-badge {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 30px;
+        }
+        
+        .progress {
+            height: 12px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        
+        .keyword-tag {
+            background: #e9ecef;
+            border-radius: 20px;
+            padding: 5px 15px;
+            display: inline-block;
+            margin: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #495057;
+        }
+        /* Error styling */
+        
+        .error-msg {
+            color: #d93025;
+            background: #fce8e6;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #f5c2c7;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero-section text-center mb-5">
+        <div class="container">
+            <h1 class="fw-bold">AI Resume Screener</h1>
+            <p class="lead">Analyze your resume against industry standards using NLP</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card p-4 mb-5 text-center">
+            <form action="/resume_screening" method="POST" enctype="multipart/form-data">
+                <h5 class="mb-3 text-start"><i class="fas fa-file-upload me-2 text-primary"></i> Upload Resume (PDF or DOCX)</h5>
+                {% if error %}
+                <div class="error-msg mb-3 text-start">⚠️ {{ error }}</div>
+                {% endif %}
+                <div class="input-group">
+                    <input type="file" name="resume" class="form-control py-2" required>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">Start AI Analysis</button>
+                </div>
+            </form>
+        </div>
+
+        {% if result %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card p-4 mb-4 text-center border-top border-primary border-5">
+                    <h6 class="text-muted text-uppercase small">ATS Score</h6>
+                    <div class="ats-badge mb-2" style="color: {% if result.ats_score > 70 %}#28a745{% elif result.ats_score > 40 %}#fd7e14{% else %}#dc3545{% endif %};">
+                        {{ result.ats_score }}%
+                    </div>
+                    <p class="small text-muted"><strong>Strength:</strong> {% if result.ats_score > 70 %}Strong{% elif result.ats_score > 40 %}Moderate{% else %}Weak{% endif %}
+                    </p>
+                </div>
+
+                <div class="card p-4">
+                    <h6 class="text-muted text-uppercase mb-3 small">Top Match Probabilities</h6>
+                    {% for career, score in result.top_3 %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small fw-bold">
+                            <span>{{ career }}</span>
+                            <span>{{ score }}%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-primary" style="width: {{ score }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card p-4 shadow-sm h-100">
+                    <h4 class="fw-bold mb-4"><i class="fas fa-chart-line me-2 text-primary"></i> Detailed Analysis Report</h4>
+
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <p class="mb-1 text-muted">Primary Career Match:</p>
+                            <h5 class="fw-bold">{{ result.career }}</h5>
+                        </div>
+                        <div class="col-sm-6 text-sm-end">
+                            <p class="mb-1 text-muted">Word Count:</p>
+                            <h5 class="fw-bold">{{ result.word_count }} words</h5>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h5 class="fw-bold mb-3"><i class="fas fa-tags me-2 text-success"></i> Keywords to Add (ATS Gap)</h5>
+                    <p class="small text-muted">Include these keywords to improve your match for <strong>{{ result.career }}</strong>:</p>
+                    <div class="mb-4">
+                        {% if result.career == "Web Developer" %}
+                        <span class="keyword-tag">React.js</span> <span class="keyword-tag">Node.js</span> <span class="keyword-tag">REST API</span> {% elif result.career == "Data Scientist" %}
+                        <span class="keyword-tag">Pandas</span> <span class="keyword-tag">Machine Learning</span> <span class="keyword-tag">TensorFlow</span> {% else %}
+                        <span class="keyword-tag">Technical Project Management</span> <span class="keyword-tag">Agile Methodologies</span> {% endif %}
+                    </div>
+
+                    <div class="alert alert-light border border-info">
+                        <h6 class="fw-bold text-info"><i class="fas fa-lightbulb me-2"></i> Improvement Suggestion</h6>
+                        <ul class="small mb-0">
+                            <li>Ensure your contact information is at the very top.</li>
+                            <li>Use bullet points for experience instead of paragraphs.</li>
+                            <li>Quantify results (e.g., "Increased efficiency by 15%").</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="text-center my-5">
+            <a href="/career_guidance" class="btn btn-outline-secondary me-2">Back to Career Guidance</a>
+            <a href="/logout" class="btn btn-outline-danger">Logout</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

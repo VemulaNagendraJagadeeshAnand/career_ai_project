@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CareerPath AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+        }
+        
+        .sidebar {
+            background: #4a148c;
+            color: white;
+            min-height: 100vh;
+            padding: 25px;
+            position: fixed;
+            width: 250px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 40px;
+        }
+        
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            padding: 30px;
+            background: white;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .icon-circle {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 35px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            transition: 0.3s;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h3 class="fw-bold mb-4 text-center"><i class="fas fa-user-shield me-2"></i>Admin Panel</h3>
+        <hr>
+        <nav class="nav flex-column">
+            <a href="/admin" class="nav-link active"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+            <a href="/admin/bulk_screen" class="nav-link"><i class="fas fa-layer-group me-2"></i> Batch Screening</a>
+            <a href="/logout" class="nav-link text-danger fw-bold" style="margin-top: 280px;"><i class="fas fa-power-off me-2"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">System Insights</h2>
+            <span class="badge bg-success py-2 px-3 shadow-sm"><i class="fas fa-link me-1"></i> MongoDB Atlas Connected</span>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="icon-circle bg-primary text-white"><i class="fas fa-users"></i></div>
+                    <h6 class="text-muted text-uppercase small fw-bold">Total Students</h6>
+                    <p class="h2 fw-bold m-0">{{ analytics["users"] }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="icon-circle bg-success text-white"><i class="fas fa-file-signature"></i></div>
+                    <h6 class="text-muted text-uppercase small fw-bold">Total Screenings</h6>
+                    <p class="h2 fw-bold m-0">{{ analytics["resumes"] }}</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card border-top border-warning border-5">
+                    <div class="icon-circle bg-warning text-dark"><i class="fas fa-bolt"></i></div>
+                    <h6 class="text-muted text-uppercase small fw-bold">Trending Field</h6>
+                    <p class="h2 fw-bold m-0 text-primary" style="font-size: 1.4rem;">{{ top_career }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h5 class="fw-bold mb-4 text-center">Career Recommendation Distribution</h5>
+            <canvas id="careerChart" style="max-height: 380px;"></canvas>
+        </div>
+
+        <div class="mt-5 p-4 bg-white rounded-3 shadow-sm border-start border-primary border-5">
+            <h5 class="fw-bold"><i class="fas fa-info-circle text-primary me-2"></i> Project Architecture</h5>
+            <p class="text-muted small mb-0">
+                This dashboard aggregates live data processed by the <strong>TF-IDF Vectorization engine</strong>. Student interaction history is persistently stored in the <strong>career_ai_database</strong> on MongoDB Atlas.
+            </p>
+        </div>
+    </div>
+
+
+
+    <script>
+        // Use the context from the backend to render the Chart
+        const ctx = document.getElementById('careerChart').getContext('2d');
+
+        // FIXED: Removed extra spaces and braces to ensure valid JavaScript arrays
+        const careerLabels = {
+            {
+                career_labels | tojson
+            }
+        };
+        const careerValues = {
+            {
+                career_values | tojson
+            }
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: careerLabels,
+                datasets: [{
+                    label: 'Student Count',
+                    data: careerValues,
+                    backgroundColor: 'rgba(74, 20, 140, 0.6)',
+                    borderColor: 'rgba(74, 20, 140, 1)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

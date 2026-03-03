@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - CareerPath AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        
+        .register-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .register-header h2 {
+            color: #4a148c;
+            font-weight: 700;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.25 border-radius rgba(102, 126, 234, 0.25);
+        }
+        
+        .btn-register {
+            background: #6a1b9a;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 700;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-register:hover {
+            background: #4a148c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 27, 154, 0.3);
+        }
+        
+        .login-link {
+            text-decoration: none;
+            color: #6a1b9a;
+            font-weight: 700;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-radius: 10px 0 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="register-card">
+        <div class="register-header text-center mb-4">
+            <h2>Create Account</h2>
+            <p class="text-muted">Join CareerPath AI to start your journey</p>
+        </div>
+
+        <form action="/register" method="POST">
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email Address</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                    <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" name="password" class="form-control" placeholder="Create a strong password" required>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Primary Interest</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
+                    <select name="interest" class="form-select" required>
+                    <option value="" disabled selected>Select your target field</option>
+                    <option value="Data Scientist">Data Scientist</option>
+                    <option value="Web Developer">Web Developer</option>
+                    <option value="AI Engineer">AI Engineer</option>
+                    <option value="Cybersecurity Analyst">Cybersecurity Analyst</option>
+                    <option value="Cloud Engineer">Cloud Engineer</option>
+                    <option value="Java Developer">Java Developer</option>
+                </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-register w-100 mb-3">
+            Register Now <i class="fas fa-user-plus ms-2"></i>
+        </button>
+        </form>
+
+        <div class="text-center">
+            <p class="small text-muted mb-0">Already have an account? <a href="/login" class="login-link">Sign In</a></p>
+            <hr class="my-3">
+            <a href="/" class="btn btn-link btn-sm text-decoration-none text-muted">Back to Welcome Page</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

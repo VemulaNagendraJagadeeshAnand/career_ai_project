@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Screening - CareerPath AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 40px 0;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .score-badge {
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero-section text-center mb-5">
+        <div class="container">
+            <h1 class="fw-bold"><i class="fas fa-layer-group me-2"></i>Batch AI Screening</h1>
+            <p class="lead">Efficiently rank multiple resumes against job requirements</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="card p-4 mb-4">
+            <form action="/admin/bulk_screen" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">1. Enter Job Description (JD)</label>
+                    <textarea name="jd" class="form-control" rows="5" placeholder="Skills, qualifications, and responsibilities..." required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">2. Upload Resumes (Multiple Files)</label>
+                    <input type="file" name="resumes" class="form-control" multiple required>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success px-5 fw-bold">Run Batch NLP Analysis</button>
+                </div>
+            </form>
+        </div>
+
+        {% if results %}
+        <div class="card p-4">
+            <h4 class="fw-bold mb-4"><i class="fas fa-list-ol me-2 text-success"></i> Ranked Candidates</h4>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Rank</th>
+                            <th>Candidate Filename</th>
+                            <th>Match Progress</th>
+                            <th>AI Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in results %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td class="fw-bold">{{ item.name }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                        <div class="progress-bar bg-success" style="width: {{ item.score }}%"></div>
+                                    </div>
+                                    <span class="small">{{ item.score }}%</span>
+                                </div>
+                            </td>
+                            <td>
+                                {% if item.score >= 70 %}
+                                <span class="badge bg-success score-badge">SHORTLISTED</span> {% elif item.score >= 40 %}
+                                <span class="badge bg-warning score-badge text-dark">REVIEW NEEDED</span> {% else %}
+                                <span class="badge bg-danger score-badge">NOT MATCHED</span> {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="text-center mt-5">
+            <a href="/admin" class="btn btn-outline-secondary me-2"><i class="fas fa-arrow-left me-1"></i> Dashboard</a>
+            <a href="/logout" class="btn btn-outline-danger">Logout</a>
+        </div>
+    </div>
+
+</body>
+
+</html>

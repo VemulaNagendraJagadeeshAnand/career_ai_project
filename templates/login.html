@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CareerPath AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 35px;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        /* Red Error Alert Style */
+        
+        .error-box {
+            color: #d93025;
+            /* Dark Red Text */
+            background-color: #fce8e6;
+            /* Soft Red Background */
+            border: 1px solid #f5c2c7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            animation: shake 0.4s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            75% {
+                transform: translateX(5px);
+            }
+        }
+        
+        .btn-primary {
+            background: #6a1b9a;
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: #4a148c;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-primary">Sign In</h2>
+            <p class="text-muted small">Access your CareerPath AI account</p>
+        </div>
+
+        {% if error %}
+        <div class="error-box">
+            <i class="fas fa-exclamation-circle me-2"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <form action="/login" method="POST">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fas fa-user text-muted"></i></span>
+                    <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light"><i class="fas fa-lock text-muted"></i></span>
+                    <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 shadow-sm">
+            Sign In <i class="fas fa-sign-in-alt ms-2"></i>
+        </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <p class="small text-muted">Don't have an account? <a href="/register" class="text-decoration-none fw-bold text-primary">Register Here</a></p>
+        </div>
+    </div>
+
+</body>
+
+</html>

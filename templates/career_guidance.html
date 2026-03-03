@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Guidance - CareerPath AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 40px 0;
+            border-bottom-left-radius: 50px;
+            border-bottom-right-radius: 50px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .roadmap-icon {
+            font-size: 2rem;
+            color: #4facfe;
+            margin-bottom: 15px;
+        }
+        
+        .resource-link {
+            text-decoration: none;
+            font-weight: 600;
+            color: #007bff;
+        }
+        
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+        /* Red Error styling for skill input */
+        
+        .error-msg {
+            color: #d93025;
+            background: #fce8e6;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            border: 1px solid #f5c2c7;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero-section text-center mb-5">
+        <div class="container">
+            <h1 class="fw-bold">AI Career Navigator</h1>
+            <p class="lead">Unlock your potential with personalized learning paths</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card p-4 mb-5">
+            <form action="/career_guidance" method="POST">
+                <h5 class="mb-3"><i class="fas fa-search-plus me-2"></i> What are your current skills?</h5>
+                {% if error %}
+                <div class="error-msg mb-3">⚠️ {{ error }}</div>
+                {% endif %}
+                <div class="input-group">
+                    <input type="text" name="skills" class="form-control py-3" placeholder="e.g. Python, SQL, Machine Learning..." required>
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">Get My Roadmap</button>
+                </div>
+                <p class="text-muted small mt-2">Separate skills with commas for better accuracy.</p>
+            </form>
+        </div>
+
+        {% if result %}
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card p-4 mb-4 text-center">
+                    <h6 class="text-muted text-uppercase">Top Recommendation</h6>
+                    <h3 class="text-primary fw-bold">{{ best_career }}</h3>
+                    <hr>
+                    <p class="small text-muted">Based on your skills, you have a high potential in this field.</p>
+                </div>
+
+                <div class="card p-4">
+                    <h6 class="text-muted text-uppercase mb-3">Skill Match Breakdown</h6>
+                    {% for career, score in result.items() %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small fw-bold">
+                            <span>{{ career }}</span>
+                            <span>{{ score }}%</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar" style="width: {{ score }}%; background: #4facfe;"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                {% if roadmap %}
+                <div class="card p-5">
+                    <div class="text-center">
+                        <i class="fas fa-map-marked-alt roadmap-icon"></i>
+                        <h2 class="fw-bold mb-4">Your Professional Roadmap</h2>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6 mb-4">
+                            <h5 class="fw-bold text-dark"><i class="fas fa-brain me-2 text-primary"></i> Skills to Master</h5>
+                            <ul class="list-group list-group-flush">
+                                {% for skill in roadmap.skills %}
+                                <li class="list-group-item border-0 ps-0"><i class="fas fa-check-circle text-success me-2"></i> {{ skill }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <h5 class="fw-bold text-dark"><i class="fas fa-tools me-2 text-primary"></i> Essential Tools</h5>
+                            <ul class="list-group list-group-flush">
+                                {% for tool in roadmap.tools %}
+                                <li class="list-group-item border-0 ps-0"><i class="fas fa-laptop-code text-secondary me-2"></i> {{ tool }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info py-3 text-center">
+                        <i class="fas fa-clock me-2"></i> <strong>Estimated Time:</strong> {{ roadmap.time }} to reach intermediate level.
+                    </div>
+
+                    <h5 class="fw-bold mt-4"><i class="fas fa-graduation-cap me-2 text-primary"></i> Suggested Learning</h5>
+                    <div class="list-group mt-2">
+                        {% for resource in roadmap.resources %}
+                        <a href="{{ resource.url }}" target="_blank" class="list-group-item list-group-item-action resource-link py-3">
+                            <i class="fab fa-youtube text-danger me-2"></i> {{ resource.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="text-center my-5">
+            <a href="/resume_screening" class="btn btn-outline-primary me-2">Go to Resume Screening</a>
+            <a href="/logout" class="btn btn-outline-danger">Logout</a>
+        </div>
+    </div>
+
+</body>
+
+</html>
