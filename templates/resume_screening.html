@@ -3,164 +3,133 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Screening - CareerPath AI</title>
+    <title>Resume Screener | CareerPath AI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+         :root {
+            --sidebar: #0f172a;
+            --accent: #6366f1;
+        }
+        
         body {
-            background-color: #f4f7f6;
-            font-family: 'Segoe UI', sans-serif;
+            background: #f1f5f9;
+            display: flex;
+            margin: 0;
         }
-        /* Matching Career Guidance Hero Section */
         
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background: var(--sidebar);
             color: white;
-            padding: 40px 0;
-            border-bottom-left-radius: 50px;
-            border-bottom-right-radius: 50px;
+            padding: 2.5rem 1.5rem;
+            position: fixed;
         }
         
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-        /* Analysis Results Styling */
-        
-        .ats-badge {
-            font-size: 1.2rem;
-            font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 30px;
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 3rem;
         }
         
-        .progress {
-            height: 12px;
+        .glass-card {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            margin-bottom: 2rem;
+        }
+        
+        .score-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 10px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent);
+            position: relative;
+        }
+        
+        .nav-link-custom {
+            color: rgba(255, 255, 255, 0.7);
+            padding: 12px;
+            border-radius: 12px;
+            display: block;
+            text-decoration: none;
+            margin-bottom: 8px;
+        }
+        
+        .nav-link-custom.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #38bdf8;
+        }
+        
+        .tag-badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 6px 12px;
             border-radius: 10px;
-            margin-top: 5px;
-        }
-        
-        .keyword-tag {
-            background: #e9ecef;
-            border-radius: 20px;
-            padding: 5px 15px;
+            font-weight: 700;
+            font-size: 0.75rem;
             display: inline-block;
-            margin: 5px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #495057;
-        }
-        /* Error styling */
-        
-        .error-msg {
-            color: #d93025;
-            background: #fce8e6;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #f5c2c7;
-            font-weight: bold;
+            margin: 4px;
         }
     </style>
 </head>
 
 <body>
-
-    <div class="hero-section text-center mb-5">
-        <div class="container">
-            <h1 class="fw-bold">AI Resume Screener</h1>
-            <p class="lead">Analyze your resume against industry standards using NLP</p>
-        </div>
+    <div class="sidebar">
+        <h4 class="fw-bold mb-5">CareerPath AI</h4>
+        <nav>
+            <a href="{{ url_for('student_dashboard') }}" class="nav-link-custom"><i class="fas fa-th-large me-2"></i> Dashboard</a>
+            <a href="{{ url_for('career_guidance') }}" class="nav-link-custom"><i class="fas fa-compass me-2"></i> Navigator</a>
+            <a href="{{ url_for('resume_screening') }}" class="nav-link-custom active"><i class="fas fa-file-alt me-2"></i> Screener</a>
+        </nav>
     </div>
 
-    <div class="container">
-        <div class="card p-4 mb-5 text-center">
-            <form action="/resume_screening" method="POST" enctype="multipart/form-data">
-                <h5 class="mb-3 text-start"><i class="fas fa-file-upload me-2 text-primary"></i> Upload Resume (PDF or DOCX)</h5>
-                {% if error %}
-                <div class="error-msg mb-3 text-start">⚠️ {{ error }}</div>
-                {% endif %}
-                <div class="input-group">
-                    <input type="file" name="resume" class="form-control py-2" required>
-                    <button type="submit" class="btn btn-primary px-4 fw-bold">Start AI Analysis</button>
+    <div class="main-content">
+        <div class="glass-card" style="background: linear-gradient(135deg, #6366f1, #a855f7); color: white;">
+            <h3 class="fw-bold">AI Resume Screening</h3>
+            <p class="opacity-75">Upload your resume to benchmark against industry standards or a custom Job Description.</p>
+            <form action="{{ url_for('resume_screening') }}" method="POST" enctype="multipart/form-data" class="mt-4">
+                <div class="row g-3">
+                    <div class="col-md-5"><input type="file" name="resume" class="form-control" required></div>
+                    <div class="col-md-5"><input type="text" name="job_description" class="form-control" placeholder="Optional: Paste Job Description..."></div>
+                    <div class="col-md-2"><button class="btn btn-dark w-100 fw-bold">Scan Profile</button></div>
                 </div>
             </form>
         </div>
 
         {% if result %}
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card p-4 mb-4 text-center border-top border-primary border-5">
-                    <h6 class="text-muted text-uppercase small">ATS Score</h6>
-                    <div class="ats-badge mb-2" style="color: {% if result.ats_score > 70 %}#28a745{% elif result.ats_score > 40 %}#fd7e14{% else %}#dc3545{% endif %};">
-                        {{ result.ats_score }}%
-                    </div>
-                    <p class="small text-muted"><strong>Strength:</strong> {% if result.ats_score > 70 %}Strong{% elif result.ats_score > 40 %}Moderate{% else %}Weak{% endif %}
-                    </p>
-                </div>
-
-                <div class="card p-4">
-                    <h6 class="text-muted text-uppercase mb-3 small">Top Match Probabilities</h6>
-                    {% for career, score in result.top_3 %}
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between small fw-bold">
-                            <span>{{ career }}</span>
-                            <span>{{ score }}%</span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-primary" style="width: {{ score }}%"></div>
-                        </div>
-                    </div>
-                    {% endfor %}
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="glass-card text-center">
+                    <h6 class="text-muted small fw-bold mb-4">ATS COMPATIBILITY</h6>
+                    <div class="score-circle" style="border-top-color: #6366f1;">{{ result.ats_score }}%</div>
+                    <h5 class="fw-bold">{{ result.career }}</h5>
                 </div>
             </div>
-
-            <div class="col-md-8">
-                <div class="card p-4 shadow-sm h-100">
-                    <h4 class="fw-bold mb-4"><i class="fas fa-chart-line me-2 text-primary"></i> Detailed Analysis Report</h4>
-
-                    <div class="row mb-4">
-                        <div class="col-sm-6">
-                            <p class="mb-1 text-muted">Primary Career Match:</p>
-                            <h5 class="fw-bold">{{ result.career }}</h5>
-                        </div>
-                        <div class="col-sm-6 text-sm-end">
-                            <p class="mb-1 text-muted">Word Count:</p>
-                            <h5 class="fw-bold">{{ result.word_count }} words</h5>
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <h5 class="fw-bold mb-3"><i class="fas fa-tags me-2 text-success"></i> Keywords to Add (ATS Gap)</h5>
-                    <p class="small text-muted">Include these keywords to improve your match for <strong>{{ result.career }}</strong>:</p>
+            <div class="col-lg-8">
+                <div class="glass-card h-100">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-clipboard-list text-primary me-2"></i> Detailed Analysis</h5>
                     <div class="mb-4">
-                        {% if result.career == "Web Developer" %}
-                        <span class="keyword-tag">React.js</span> <span class="keyword-tag">Node.js</span> <span class="keyword-tag">REST API</span> {% elif result.career == "Data Scientist" %}
-                        <span class="keyword-tag">Pandas</span> <span class="keyword-tag">Machine Learning</span> <span class="keyword-tag">TensorFlow</span> {% else %}
-                        <span class="keyword-tag">Technical Project Management</span> <span class="keyword-tag">Agile Methodologies</span> {% endif %}
+                        <small class="fw-bold text-muted d-block mb-2">IDENTIFIED TECHNICAL SKILLS</small> {% for m in result.matches %}<span class="tag-badge">{{ m }}</span>{% endfor %}
                     </div>
-
-                    <div class="alert alert-light border border-info">
-                        <h6 class="fw-bold text-info"><i class="fas fa-lightbulb me-2"></i> Improvement Suggestion</h6>
-                        <ul class="small mb-0">
-                            <li>Ensure your contact information is at the very top.</li>
-                            <li>Use bullet points for experience instead of paragraphs.</li>
-                            <li>Quantify results (e.g., "Increased efficiency by 15%").</li>
-                        </ul>
+                    <div class="p-4 bg-light rounded-4 border-start border-primary border-5">
+                        <h6 class="fw-bold text-primary">Strategic Advice</h6>
+                        <p class="small m-0">Your profile is best aligned for <b>{{ result.career }}</b>. Focus on quantifying your project impacts to improve your rank.</p>
                     </div>
                 </div>
             </div>
         </div>
         {% endif %}
-
-        <div class="text-center my-5">
-            <a href="/career_guidance" class="btn btn-outline-secondary me-2">Back to Career Guidance</a>
-            <a href="/logout" class="btn btn-outline-danger">Logout</a>
-        </div>
     </div>
-
 </body>
 
 </html>

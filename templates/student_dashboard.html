@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CareerPath AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+         :root {
+            --sidebar-bg: #0f172a;
+            --accent: #38bdf8;
+            --card-bg: rgba(255, 255, 255, 0.9);
+        }
+        
+        body {
+            background: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+        }
+        /* Sidebar Styles */
+        
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 2.5rem 1.5rem;
+            position: fixed;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 3rem;
+        }
+        /* Glassmorphism Cards */
+        
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            margin-bottom: 2rem;
+        }
+        
+        .nav-link-custom {
+            color: rgba(255, 255, 255, 0.7);
+            padding: 12px;
+            border-radius: 12px;
+            display: block;
+            text-decoration: none;
+            margin-bottom: 8px;
+            transition: 0.3s;
+        }
+        
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+        }
+        
+        .table {
+            background: transparent;
+        }
+        
+        .badge-ats {
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h4 class="fw-bold mb-5"><i class="fas fa-rocket text-info me-2"></i> CareerPath AI</h4>
+        <nav>
+            <a href="{{ url_for('student_dashboard') }}" class="nav-link-custom active"><i class="fas fa-th-large me-2"></i> Dashboard</a>
+            <a href="{{ url_for('career_guidance') }}" class="nav-link-custom"><i class="fas fa-compass me-2"></i> Navigator</a>
+            <a href="{{ url_for('resume_screening') }}" class="nav-link-custom"><i class="fas fa-file-alt me-2"></i> Screener</a>
+            <hr class="opacity-25 my-4">
+            <a href="{{ url_for('logout') }}" class="nav-link-custom text-danger"><i class="fas fa-power-off me-2"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <h2 class="fw-bold mb-4">Student Insights</h2>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="glass-card text-center h-100">
+                    <div class="bg-primary-subtle rounded-circle d-inline-flex p-3 mb-3"><i class="fas fa-user-circle fa-3x text-primary"></i></div>
+                    <h4 class="fw-bold">{{ user.username }}</h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <div class="p-3 bg-light rounded-4">
+                        <small class="fw-bold text-uppercase text-muted d-block">Initial Interest</small>
+                        <span class="text-primary fw-bold">{{ user.interest }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="glass-card h-100">
+                    <h5 class="fw-bold mb-4">ATS Score Improvement</h5>
+                    <canvas id="progressChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card mt-4">
+            <h5 class="fw-bold mb-4">Recent Activity History</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Career Track</th>
+                        <th>ATS Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                    <tr>
+                        <td class="fw-bold">{{ item.career }}</td>
+                        <td><span class="badge-ats">{{ item.ats }}% Match</span></td>
+                        <td class="text-muted">{{ item.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        const historyData = {
+            {
+                history | tojson
+            }
+        };
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: historyData.map(i => i.timestamp),
+                datasets: [{
+                    label: 'Score',
+                    data: historyData.map(i => i.ats),
+                    borderColor: '#38bdf8',
+                    fill: true,
+                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

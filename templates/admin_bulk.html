@@ -8,91 +8,129 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+         :root {
+            --admin-primary: #4a148c;
+            --admin-bg: #f4f7f6;
+            --sidebar-width: 260px;
+        }
+        
         body {
-            background-color: #f4f7f6;
+            background: var(--admin-bg);
             font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            display: flex;
         }
         
-        .hero-section {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--admin-primary);
             color: white;
-            padding: 40px 0;
-            border-bottom-left-radius: 50px;
-            border-bottom-right-radius: 50px;
+            padding: 2.5rem 1.5rem;
+            position: fixed;
         }
         
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            padding: 3rem;
         }
         
-        .score-badge {
-            font-weight: bold;
-            padding: 5px 12px;
+        .glass-card {
+            background: white;
             border-radius: 20px;
-            font-size: 0.8rem;
+            padding: 2rem;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .nav-link-admin {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px;
+            border-radius: 12px;
+            display: block;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+        
+        .nav-link-admin.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+        
+        .rank-badge {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #4a148c;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
         }
     </style>
 </head>
 
 <body>
-
-    <div class="hero-section text-center mb-5">
-        <div class="container">
-            <h1 class="fw-bold"><i class="fas fa-layer-group me-2"></i>Batch AI Screening</h1>
-            <p class="lead">Efficiently rank multiple resumes against job requirements</p>
-        </div>
+    <div class="sidebar">
+        <h4 class="fw-bold mb-5"><i class="fas fa-user-shield me-2"></i> Admin Panel</h4>
+        <nav>
+            <a href="{{ url_for('admin') }}" class="nav-link-admin"><i class="fas fa-chart-line me-2"></i> System Insights</a>
+            <a href="{{ url_for('admin_bulk_screen') }}" class="nav-link-admin active"><i class="fas fa-layer-group me-2"></i> Batch Screening</a>
+            <hr class="opacity-25 my-4">
+            <a href="{{ url_for('logout') }}" class="nav-link-admin text-danger fw-bold"><i class="fas fa-power-off me-2"></i> Logout</a>
+        </nav>
     </div>
 
-    <div class="container mb-5">
-        <div class="card p-4 mb-4">
-            <form action="/admin/bulk_screen" method="POST" enctype="multipart/form-data">
+    <div class="main-content">
+        <div class="glass-card" style="background: linear-gradient(135deg, #4a148c, #7b1fa2); color: white;">
+            <h3 class="fw-bold">Recruiter Batch Screening</h3>
+            <p class="opacity-75">Upload multiple candidate resumes to rank them against a specific Job Description.</p>
+            <form action="{{ url_for('admin_bulk_screen') }}" method="POST" enctype="multipart/form-data" class="mt-4">
                 <div class="mb-3">
-                    <label class="form-label fw-bold">1. Enter Job Description (JD)</label>
-                    <textarea name="jd" class="form-control" rows="5" placeholder="Skills, qualifications, and responsibilities..." required></textarea>
+                    <label class="small fw-bold mb-2">Target Job Description</label>
+                    <textarea name="jd" class="form-control" rows="3" placeholder="Paste JD requirements here..." required></textarea>
                 </div>
-                <div class="mb-4">
-                    <label class="form-label fw-bold">2. Upload Resumes (Multiple Files)</label>
-                    <input type="file" name="resumes" class="form-control" multiple required>
-                </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-success px-5 fw-bold">Run Batch NLP Analysis</button>
+                <div class="row align-items-center">
+                    <div class="col-md-9">
+                        <label class="small fw-bold mb-2">Candidate Resumes (Multiple PDF/DOCX)</label>
+                        <input type="file" name="resumes" class="form-control" multiple required>
+                    </div>
+                    <div class="col-md-3 pt-4">
+                        <button class="btn btn-dark w-100 fw-bold">Rank Candidates</button>
+                    </div>
                 </div>
             </form>
         </div>
 
         {% if results %}
-        <div class="card p-4">
-            <h4 class="fw-bold mb-4"><i class="fas fa-list-ol me-2 text-success"></i> Ranked Candidates</h4>
+        <div class="glass-card">
+            <h5 class="fw-bold mb-4"><i class="fas fa-list-ol text-primary me-2"></i> Candidate Ranking Results</h5>
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="table-light">
+                <table class="table align-middle">
+                    <thead>
                         <tr>
                             <th>Rank</th>
-                            <th>Candidate Filename</th>
-                            <th>Match Progress</th>
-                            <th>AI Recommendation</th>
+                            <th>Candidate File</th>
+                            <th>Compatibility Score</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for item in results %}
+                        {% for res in results %}
                         <tr>
-                            <td>{{ loop.index }}</td>
-                            <td class="fw-bold">{{ item.name }}</td>
+                            <td>
+                                <div class="rank-badge">{{ loop.index }}</div>
+                            </td>
+                            <td class="fw-bold text-dark">{{ res.name }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="progress flex-grow-1 me-2" style="height: 8px;">
-                                        <div class="progress-bar bg-success" style="width: {{ item.score }}%"></div>
+                                    <div class="progress flex-grow-1 me-3" style="height: 8px;">
+                                        <div class="progress-bar bg-success" style="width: {{ res.score }}%"></div>
                                     </div>
-                                    <span class="small">{{ item.score }}%</span>
+                                    <span class="fw-bold">{{ res.score }}%</span>
                                 </div>
-                            </td>
-                            <td>
-                                {% if item.score >= 70 %}
-                                <span class="badge bg-success score-badge">SHORTLISTED</span> {% elif item.score >= 40 %}
-                                <span class="badge bg-warning score-badge text-dark">REVIEW NEEDED</span> {% else %}
-                                <span class="badge bg-danger score-badge">NOT MATCHED</span> {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
@@ -101,13 +139,7 @@
             </div>
         </div>
         {% endif %}
-
-        <div class="text-center mt-5">
-            <a href="/admin" class="btn btn-outline-secondary me-2"><i class="fas fa-arrow-left me-1"></i> Dashboard</a>
-            <a href="/logout" class="btn btn-outline-danger">Logout</a>
-        </div>
     </div>
-
 </body>
 
 </html>
