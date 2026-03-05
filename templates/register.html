@@ -8,72 +8,125 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Shared Design System */
+        
+         :root {
+            --primary-purple: #764ba2;
+            --secondary-purple: #667eea;
+            --glass-white: rgba(255, 255, 255, 0.12);
+        }
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--secondary-purple) 0%, var(--primary-purple) 100%);
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
+            padding: 2rem 0;
+            color: white;
+            margin: 0;
         }
         
         .register-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 2.5rem;
             width: 100%;
             max-width: 500px;
-            padding: 40px;
-            border-radius: 20px;
-            background: #ffffff;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        /* Role Switcher */
+        
+        .role-switcher {
+            display: flex;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 50px;
+            padding: 5px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
-        .register-header h2 {
-            color: #4a148c;
+        .role-switcher input[type="radio"] {
+            display: none;
+        }
+        
+        .role-switcher label {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: 0.3s;
             font-weight: 700;
+            font-size: 0.8rem;
+            margin-bottom: 0;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .role-switcher input[type="radio"]:checked+label {
+            background: white;
+            color: var(--primary-purple);
         }
         
         .form-label {
-            font-weight: 600;
-            color: #495057;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+            display: block;
         }
         
         .form-control,
         .form-select {
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white !important;
+            border-radius: 12px;
             padding: 10px 15px;
-            border: 1px solid #dee2e6;
+            margin-bottom: 1rem;
         }
         
-        .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.25 border-radius rgba(102, 126, 234, 0.25);
+        .form-control:focus,
+        .form-select:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: white;
+            box-shadow: none;
+        }
+        
+        .form-select option {
+            color: #333;
         }
         
         .btn-register {
-            background: #6a1b9a;
+            background: white;
+            color: var(--primary-purple);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 12px;
-            font-weight: 700;
-            color: white;
-            transition: all 0.3s ease;
+            font-weight: 800;
+            width: 100%;
+            text-transform: uppercase;
+            transition: 0.3s;
+            margin-top: 10px;
         }
         
         .btn-register:hover {
-            background: #4a148c;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(106, 27, 154, 0.3);
+            transform: scale(1.02);
         }
         
         .login-link {
-            text-decoration: none;
-            color: #6a1b9a;
-            font-weight: 700;
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
         }
         
-        .input-group-text {
-            background-color: #f8f9fa;
-            border-radius: 10px 0 0 10px;
+        .login-link a {
+            color: white;
+            font-weight: 700;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -81,64 +134,75 @@
 <body>
 
     <div class="register-card">
-        <div class="register-header text-center mb-4">
-            <h2>Create Account</h2>
-            <p class="text-muted">Join CareerPath AI to start your journey</p>
+        <div class="text-center mb-4">
+            <h2 class="fw-bold m-0"><i class="fas fa-user-plus me-2"></i> Join CareerPath AI</h2>
+            <p class="small opacity-75 mt-2">Create your account to start your journey</p>
         </div>
 
-        <form action="/register" method="POST">
-            <div class="mb-3">
-                <label class="form-label">Username</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                    <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+        <form action="{{ url_for('register') }}" method="POST">
+            <div class="role-switcher">
+                <input type="radio" name="role" id="student" value="student" checked onclick="toggleInterest(true)">
+                <label for="student">STUDENT</label>
+
+                <input type="radio" name="role" id="admin" value="admin" onclick="toggleInterest(false)">
+                <label for="admin">ADMIN</label>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="Unique ID" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="name@email.com" required>
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Email Address</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                    <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
-                </div>
-            </div>
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
 
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                    <input type="password" name="password" class="form-control" placeholder="Create a strong password" required>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <label class="form-label">Primary Interest</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-briefcase"></i></span>
-                    <select name="interest" class="form-select" required>
-                    <option value="" disabled selected>Select your target field</option>
+            <div id="interest-container">
+                <label class="form-label">Primary Career Interest</label>
+                <select name="interest" id="interest-select" class="form-select" required>
+                    <option value="" disabled selected>Select a path...</option>
                     <option value="Data Scientist">Data Scientist</option>
                     <option value="Web Developer">Web Developer</option>
                     <option value="AI Engineer">AI Engineer</option>
+                    <option value="Business Analyst">Business Analyst</option>
                     <option value="Cybersecurity Analyst">Cybersecurity Analyst</option>
                     <option value="Cloud Engineer">Cloud Engineer</option>
                     <option value="Java Developer">Java Developer</option>
                 </select>
-                </div>
             </div>
 
-            <button type="submit" class="btn btn-register w-100 mb-3">
-            Register Now <i class="fas fa-user-plus ms-2"></i>
-        </button>
+            <button type="submit" class="btn btn-register">Create Account</button>
         </form>
 
-        <div class="text-center">
-            <p class="small text-muted mb-0">Already have an account? <a href="/login" class="login-link">Sign In</a></p>
-            <hr class="my-3">
-            <a href="/" class="btn btn-link btn-sm text-decoration-none text-muted">Back to Welcome Page</a>
+        <div class="login-link">
+            Already have an account? <a href="{{ url_for('login') }}">Login here</a>
         </div>
     </div>
 
+    <script>
+        /**
+         * Toggles the visibility and required status of the Career Interest field.
+         * @param {boolean} show - Whether to show the field (true for Students, false for Admins).
+         */
+        function toggleInterest(show) {
+            const container = document.getElementById('interest-container');
+            const select = document.getElementById('interest-select');
+
+            if (show) {
+                container.style.display = 'block';
+                select.setAttribute('required', 'required');
+            } else {
+                container.style.display = 'none';
+                select.removeAttribute('required');
+                select.value = ""; // Reset value for Admins
+            }
+        }
+    </script>
 </body>
 
 </html>

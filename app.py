@@ -5,25 +5,23 @@ import certifi
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, session, url_for
 from pymongo import MongoClient
-from dotenv import load_dotenv
 
 # NLP & Extraction Libraries
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from pdfminer.high_level import extract_text
 
-# Load environment variables
-load_dotenv()
-
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "career_ai_jntuk_2026_project")
+# Hardcoded Secret Key for session security
+app.secret_key = "career_ai_jntuk_2026_project"
 
 # ---------------- DATABASE CONFIGURATION ----------------
-uri = os.getenv("MONGO_URI")
+# Hardcoded URI for direct deployment (No .env required)
+uri = "mongodb+srv://226m1a05a4_db_user:JagadeeshAnand@career.cjjjztp.mongodb.net/?retryWrites=true&w=majority&appName=career"
 ca = certifi.where()
 
 try:
-    # Secure connection for MongoDB Atlas
+    # Connection with 5-second timeout to prevent hanging
     client = MongoClient(uri, tlsCAFile=ca, serverSelectionTimeoutMS=5000)
     db = client["career_ai_database"]
     students_col = db["students"]
@@ -32,15 +30,15 @@ try:
 except Exception as e:
     print(f"❌ Database Connection Error: {e}")
 
-# ---------------- KNOWLEDGE BASE (NLP & Roadmaps) ----------------
+# ---------------- KNOWLEDGE BASE ----------------
 CAREERS = {
-    "Data Scientist": ["python", "machine learning", "statistics", "sql", "pandas", "data visualization", "scikit-learn", "deep learning"],
-    "Web Developer": ["html", "css", "javascript", "react", "node", "express", "mongodb", "angular", "bootstrap", "typescript"],
-    "AI Engineer": ["python", "deep learning", "neural networks", "tensorflow", "pytorch", "nlp", "computer vision", "transformers"],
-    "Business Analyst": ["excel", "sql", "power bi", "tableau", "communication", "agile", "scrum", "analytics", "jira"],
-    "Cybersecurity Analyst": ["networking", "firewalls", "penetration testing", "wireshark", "linux", "siem", "encryption", "ethical hacking"],
-    "Cloud Engineer": ["aws", "azure", "docker", "kubernetes", "terraform", "cloud computing", "devops", "linux", "serverless"],
-    "Java Developer": ["java", "spring boot", "hibernate", "maven", "microservices", "mysql", "multithreading", "oops", "junit"]
+    "Data Scientist": ["python", "machine learning", "statistics", "sql", "pandas", "data visualization"],
+    "Web Developer": ["html", "css", "javascript", "react", "node", "express", "mongodb"],
+    "AI Engineer": ["python", "deep learning", "neural networks", "tensorflow", "pytorch", "nlp"],
+    "Business Analyst": ["excel", "sql", "power bi", "tableau", "communication", "agile"],
+    "Cybersecurity Analyst": ["networking", "firewalls", "penetration testing", "wireshark", "linux"],
+    "Cloud Engineer": ["aws", "azure", "docker", "kubernetes", "terraform", "cloud computing"],
+    "Java Developer": ["java", "spring boot", "hibernate", "maven", "microservices", "mysql"]
 }
 
 ROADMAPS = {
@@ -53,10 +51,10 @@ ROADMAPS = {
     "Java Developer": {"time": "6 Months", "resources": [{"name": "Spring Boot Tutorial", "url": "https://youtu.be/9SGDpanrc8U"}]}
 }
 
-# ---------------- CORE AI & EXTRACTION LOGIC ----------------
+# ---------------- CORE AI LOGIC ----------------
 
 def extract_text_from_file(file):
-    """Handles PDF and DOCX parsing in-memory"""
+    """Handles PDF and DOCX parsing"""
     filename = file.filename.lower()
     try:
         file.seek(0)
@@ -67,12 +65,12 @@ def extract_text_from_file(file):
         elif filename.endswith(".docx"):
             doc = docx.Document(file_stream)
             return " ".join([p.text for p in doc.paragraphs])
-    except Exception as e:
+    except:
         return ""
     return ""
 
 def get_ai_scores(text, careers_db):
-    """NLP Similarity Engine using TF-IDF"""
+    """NLP Similarity Engine"""
     text = text.lower()
     career_names = list(careers_db.keys())
     career_profiles = [" ".join(v) for v in careers_db.values()]
@@ -92,7 +90,7 @@ def get_ai_scores(text, careers_db):
         }
     return dict(sorted(results.items(), key=lambda x: x[1]['score'], reverse=True))
 
-# ---------------- WEB ROUTES ----------------
+# ---------------- ROUTES ----------------
 
 @app.route("/")
 def welcome(): 
@@ -101,22 +99,39 @@ def welcome():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        u, p = request.form["username"], request.form["password"]
-        if u == "admin" and p == "admin123":
-            session["admin"] = u
-            return redirect(url_for("admin"))
-        user = students_col.find_one({"username": u, "password": p})
-        if user:
-            session["user"] = u
-            return redirect(url_for("student_dashboard"))
+        role = request.form.get("role") 
+        u = request.form.get("username") 
+        p = request.form.get("password") 
+        
+        if role == "admin":
+            if u == "admin" and p == "admin123":
+                session["admin"] = u
+                return redirect(url_for("admin"))
+            else:
+                return render_template("login.html", error="Invalid Admin Credentials")
+        else:
+            user = students_col.find_one({"username": u, "password": p})
+            if user:
+                session["user"] = u
+                return redirect(url_for("student_dashboard"))
+            else:
+                return render_template("login.html", error="Invalid Student Credentials")
     return render_template("login.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        u, e, p, i = request.form["username"], request.form["email"], request.form["password"], request.form["interest"]
+        u = request.form.get("username")
+        e = request.form.get("email")
+        p = request.form.get("password")
+        i = request.form.get("interest", "Administrator") 
+        role = request.form.get("role")
+
         if not students_col.find_one({"username": u}):
-            students_col.insert_one({"username": u, "email": e, "password": p, "interest": i, "history": []})
+            students_col.insert_one({
+                "username": u, "email": e, "password": p, 
+                "interest": i, "role": role, "history": []
+            })
             return redirect(url_for("login"))
     return render_template("register.html")
 
@@ -168,30 +183,23 @@ def resume_screening():
                 students_col.update_one(
                     {"username": session["user"]}, 
                     {"$push": {"history": {"career": career_match, "ats": round(ats_score, 2), "timestamp": datetime.now().strftime("%Y-%m-%d")}} }
-                )
+                ) 
     return render_template("resume_screening.html", result=result)
 
 @app.route("/admin")
 def admin():
-    """Aggregates system-wide analytics for the Admin Dashboard"""
     if "admin" not in session: return redirect(url_for("login"))
-    
     all_users = list(students_col.find({}, {"history": 1}))
     career_dist = {c: 0 for c in CAREERS.keys()}
     total_screenings = 0
-    
     for u in all_users:
         hist = u.get('history', [])
         total_screenings += len(hist)
         for e in hist:
             career_name = e.get('career')
-            if career_name in career_dist:
-                career_dist[career_name] += 1
+            if career_name in career_dist: career_dist[career_name] += 1
     
-    top_career = "No Data Yet"
-    if total_screenings > 0:
-        top_career = max(career_dist, key=career_dist.get)
-
+    top_career = max(career_dist, key=career_dist.get) if total_screenings > 0 else "No Data"
     return render_template("admin.html", 
                            analytics={"users": len(all_users), "resumes": total_screenings}, 
                            career_labels=list(career_dist.keys()), 
@@ -200,7 +208,6 @@ def admin():
 
 @app.route("/admin/bulk_screen", methods=["GET", "POST"])
 def admin_bulk_screen():
-    """Recruiter tool to rank multiple resumes against one JD"""
     if "admin" not in session: return redirect(url_for("login"))
     results = []
     if request.method == "POST":
@@ -222,4 +229,6 @@ def logout():
     return redirect(url_for("welcome"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Crucial for Render: listen on 0.0.0.0 and use dynamic PORT
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
