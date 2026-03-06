@@ -3,136 +3,166 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Career Navigator | CareerPath AI</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
          :root {
-            --sidebar-bg: #0f172a;
-            --neon: #38bdf8;
+            --primary-color: #4f46e5;
+            --bg-light: #f8fafc;
+            --sidebar-bg: #1e293b;
+            --border-color: #e2e8f0;
         }
         
         body {
-            background: #f1f5f9;
+            background-color: var(--bg-light);
+            color: #1e293b;
+            font-family: 'Inter', sans-serif;
             display: flex;
             margin: 0;
+            min-height: 100vh;
         }
+        /* Sidebar */
         
         .sidebar {
-            width: 280px;
+            width: 260px;
             height: 100vh;
             background: var(--sidebar-bg);
-            color: white;
-            padding: 2.5rem 1.5rem;
             position: fixed;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
         }
         
+        .nav-link-student {
+            color: #94a3b8;
+            padding: 12px 15px;
+            border-radius: 8px;
+            display: block;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .nav-link-student:hover,
+        .nav-link-student.active {
+            background: #334155;
+            color: white;
+        }
+        /* Main Content */
+        
         .main-content {
-            margin-left: 280px;
-            width: calc(100% - 280px);
+            margin-left: 260px;
+            width: 100%;
             padding: 3rem;
         }
         
-        .glass-card {
+        .card {
             background: white;
-            border-radius: 24px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+            padding: 30px;
+            margin-bottom: 25px;
         }
         
-        .tag {
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: 700;
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .skill-badge {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
             display: inline-block;
             margin: 4px;
         }
         
-        .tag-match {
+        .match {
             background: #dcfce7;
             color: #166534;
             border: 1px solid #bbf7d0;
         }
         
-        .tag-gap {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
+        .miss {
+            background: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fef08a;
         }
         
-        .nav-link-custom {
-            color: rgba(255, 255, 255, 0.7);
-            padding: 12px;
-            border-radius: 12px;
-            display: block;
-            text-decoration: none;
-            margin-bottom: 8px;
-        }
-        
-        .nav-link-custom.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--neon);
+        hr {
+            border-top: 1px solid var(--border-color);
+            opacity: 1;
         }
     </style>
 </head>
 
 <body>
     <div class="sidebar">
-        <h4 class="fw-bold mb-5">CareerPath AI</h4>
-        <nav>
-            <a href="{{ url_for('student_dashboard') }}" class="nav-link-custom"><i class="fas fa-th-large me-2"></i> Dashboard</a>
-            <a href="{{ url_for('career_guidance') }}" class="nav-link-custom active"><i class="fas fa-compass me-2"></i> Navigator</a>
-            <a href="{{ url_for('resume_screening') }}" class="nav-link-custom"><i class="fas fa-file-alt me-2"></i> Screener</a>
+        <h4 class="text-white fw-bold mb-5"><i class="fas fa-brain text-info me-2"></i>CareerPath AI</h4>
+        <nav class="flex-grow-1">
+            <a href="{{ url_for('student_dashboard') }}" class="nav-link-student">
+                <i class="fas fa-home me-2"></i> Dashboard
+            </a>
+            <a href="{{ url_for('resume_screening') }}" class="nav-link-student">
+                <i class="fas fa-file-alt me-2"></i> Resume Screener
+            </a>
+            <a href="{{ url_for('career_guidance') }}" class="nav-link-student active">
+                <i class="fas fa-compass me-2"></i> Career Navigator
+            </a>
         </nav>
+        <div class="mt-auto">
+            <a href="{{ url_for('logout') }}" class="nav-link-student text-danger">
+                <i class="fas fa-power-off me-2"></i> Logout
+            </a>
+        </div>
     </div>
 
     <div class="main-content">
-        <div class="glass-card mb-4">
-            <h5 class="fw-bold mb-3">AI Career Navigator</h5>
+        <h2 class="fw-bold mb-4">Smart Career Navigator</h2>
+
+        <div class="card">
+            <h5 class="fw-bold mb-3 text-primary">Explore Skills Gaps</h5>
+            <p class="text-muted small mb-4">Enter your current technical skills to see which industry roles you are most ready for.</p>
             <form action="{{ url_for('career_guidance') }}" method="POST">
-                <div class="input-group">
-                    <input type="text" name="skills" class="form-control border-0 bg-light p-3" style="border-radius: 15px 0 0 15px;" placeholder="Enter skills (e.g. Python, SQL)..." required>
-                    <button class="btn btn-dark px-4 fw-bold" style="border-radius: 0 15px 15px 0;">Analyze</button>
-                </div>
+                <textarea name="skills" class="form-control border-secondary-subtle mb-3" rows="3" placeholder="e.g. Python, SQL, Java, React..." required></textarea>
+                <button type="submit" class="btn btn-primary w-100">Analyze Career Readiness</button>
             </form>
         </div>
 
         {% if result %}
-        <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="glass-card" style="border-top: 5px solid #6366f1;">
-                    <small class="text-uppercase fw-bold text-muted">Primary Match</small>
-                    <h2 class="fw-bold mb-4">{{ best_career }}</h2>
-                    {% for career, data in result.items() %}
-                    <div class="mb-4">
-                        <div class="d-flex justify-content-between mb-1 small fw-bold">
-                            <span>{{ career }}</span><span>{{ data.score }}%</span>
-                        </div>
-                        <div class="progress mb-2" style="height: 6px;">
-                            <div class="progress-bar" style="width: {{ data.score }}%"></div>
-                        </div>
-                        <div class="mt-2">
-                            {% for m in data.matches %}<span class="tag tag-match"><i class="fas fa-check me-1"></i> {{ m }}</span>{% endfor %} {% for miss in data.missing %}<span class="tag tag-gap"><i class="fas fa-plus me-1"></i> {{ miss }}</span>{%
-                            endfor %}
+        <div class="card">
+            <h4 class="fw-bold mb-4">Recommended Learning Paths</h4>
+            {% for career, data in result.items() %}
+            <div class="mb-5 pb-2">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold m-0 text-dark">{{ loop.index }}. {{ career }}</h5>
+                    <span class="badge bg-primary rounded-pill px-3 py-2">{{ data.score }}% Match</span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <p class="small text-muted fw-bold mb-2">YOU ALREADY HAVE:</p>
+                        <div class="d-flex flex-wrap">
+                            {% for m in data.matches %} <span class="skill-badge match">{{ m }}</span> {% endfor %} {% if not data.matches %}<span class="text-muted small">No matches found.</span>{% endif %}
                         </div>
                     </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="glass-card h-100">
-                    <h5 class="fw-bold mb-4"><i class="fas fa-route text-primary me-2"></i> Upskilling Roadmap</h5>
-                    <div class="alert alert-primary border-0">Target Completion: <b>{{ roadmap.time }}</b></div>
-                    {% for res in roadmap.resources %}
-                    <div class="p-3 bg-light rounded-4 mb-3 d-flex justify-content-between align-items-center">
-                        <span><i class="fab fa-youtube text-danger me-2"></i> <b>{{ res.name }}</b></span>
-                        <a href="{{ res.url }}" target="_blank" class="btn btn-sm btn-primary rounded-pill px-3">Start</a>
+                    <div class="col-md-6">
+                        <p class="small text-muted fw-bold mb-2">SKILLS TO ACQUIRE:</p>
+                        <div class="d-flex flex-wrap">
+                            {% for mis in data.missing %} <span class="skill-badge miss">{{ mis }}</span> {% endfor %} {% if not data.missing %}<span class="text-success small">Perfect match!</span>{% endif %}
+                        </div>
                     </div>
-                    {% endfor %}
                 </div>
+                <hr class="mt-4">
             </div>
+            {% endfor %}
         </div>
         {% endif %}
     </div>

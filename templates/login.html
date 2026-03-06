@@ -8,17 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Shared Design System with Resume Screening */
-        
          :root {
             --primary-purple: #764ba2;
             --secondary-purple: #667eea;
-            --dark-slate: #0f172a;
-            --glass-white: rgba(255, 255, 255, 0.12);
         }
         
         body {
-            /* Matching Gradient from Resume Screening */
             background: linear-gradient(135deg, var(--secondary-purple) 0%, var(--primary-purple) 100%);
             font-family: 'Inter', sans-serif;
             height: 100vh;
@@ -28,7 +23,6 @@
             margin: 0;
             color: white;
         }
-        /* Glassmorphism Card */
         
         .login-card {
             background: rgba(255, 255, 255, 0.1);
@@ -40,7 +34,6 @@
             max-width: 450px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
-        /* Role Switcher */
         
         .role-switcher {
             display: flex;
@@ -63,45 +56,36 @@
             border-radius: 50px;
             transition: 0.3s;
             font-weight: 700;
-            font-size: 0.8rem;
-            margin-bottom: 0;
             color: rgba(255, 255, 255, 0.6);
         }
         
         .role-switcher input[type="radio"]:checked+label {
             background: white;
             color: var(--primary-purple);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        /* Form Inputs */
-        
-        .form-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.8);
-        }
+        /* CRITICAL FIX: Forces dark text for ALL inputs */
         
         .form-control {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: white !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #212529 !important;
+            /* Deep dark grey for visibility */
             border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 1.5rem;
+            padding: 12px;
+            margin-bottom: 1rem;
         }
+        /* Ensures text stays dark even when clicked */
         
         .form-control:focus {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: white;
-            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+            background: #ffffff !important;
+            color: #000000 !important;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.2);
+            outline: none;
         }
         
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: #6c757d !important;
         }
-        /* Submit Button */
         
         .btn-login {
             background: white;
@@ -112,66 +96,49 @@
             font-weight: 800;
             width: 100%;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
-        }
-        
-        .btn-login:hover {
-            background: #f8f9fa;
-            transform: scale(1.02);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-        }
-        
-        .footer-link {
-            text-align: center;
-            margin-top: 2rem;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .footer-link a {
-            color: white;
-            text-decoration: underline;
-            font-weight: 700;
+            margin-top: 1rem;
         }
     </style>
 </head>
 
 <body>
-
     <div class="login-card">
         <div class="text-center mb-4">
-            <h2 class="fw-bold m-0"><i class="fas fa-fingerprint me-2"></i> CareerPath AI</h2>
-            <p class="small opacity-75 mt-2">Sign in to your career intelligence portal</p>
+            <h2 class="fw-bold"><i class="fas fa-fingerprint me-2"></i> CareerPath AI</h2>
+            <p class="small opacity-75">Sign in to your portal</p>
         </div>
+
+        {% if error %}
+        <div class="alert alert-danger py-2 small text-center" style="border-radius: 10px;">
+            {{ error }}
+        </div>
+        {% endif %}
 
         <form action="{{ url_for('login') }}" method="POST">
             <div class="role-switcher">
                 <input type="radio" name="role" id="student" value="student" checked>
                 <label for="student">STUDENT</label>
-
                 <input type="radio" name="role" id="admin" value="admin">
                 <label for="admin">ADMIN</label>
             </div>
 
-            <div class="mb-1">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" placeholder="Enter portal ID" required>
+            <div class="mb-3">
+                <label class="small fw-bold mb-1">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Enter Username" required>
             </div>
 
-            <div class="mb-1">
-                <label class="form-label">Password</label>
+            <div class="mb-3">
+                <label class="small fw-bold mb-1">Password</label>
                 <input type="password" name="password" class="form-control" placeholder="••••••••" required>
             </div>
 
             <button type="submit" class="btn btn-login">Access Portal</button>
         </form>
 
-        <div class="footer-link">
-            New candidate? <a href="{{ url_for('register') }}">Join Now</a>
+        <div class="text-center mt-4 small">
+            New candidate? <a href="{{ url_for('register') }}" class="text-white fw-bold">Join Now</a>
         </div>
     </div>
-
 </body>
 
 </html>

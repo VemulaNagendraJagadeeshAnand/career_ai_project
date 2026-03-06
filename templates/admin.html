@@ -4,62 +4,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - CareerPath AI</title>
+    <title>Admin Intelligence | CareerPath AI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
          :root {
-            --admin-primary: #4a148c;
-            --admin-bg: #f4f7f6;
-            --sidebar-width: 260px;
+            --admin-purple: #4a148c;
+            --bg-fade: #f8fafc;
+            --sidebar-w: 260px;
         }
         
         body {
-            background: var(--admin-bg);
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-fade);
+            font-family: 'Inter', system-ui, sans-serif;
             margin: 0;
             display: flex;
         }
-        /* Admin Sidebar */
+        /* Sidebar Navigation */
         
         .sidebar {
-            width: var(--sidebar-width);
+            width: var(--sidebar-w);
             height: 100vh;
-            background: var(--admin-primary);
+            background: var(--admin-purple);
             color: white;
             padding: 2.5rem 1.5rem;
             position: fixed;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
         
         .main-content {
-            margin-left: var(--sidebar-width);
-            width: calc(100% - var(--sidebar-width));
+            margin-left: var(--sidebar-w);
+            width: calc(100% - var(--sidebar-w));
             padding: 3rem;
-        }
-        /* Glass Cards */
-        
-        .glass-card {
-            background: white;
-            border-radius: 20px;
-            padding: 2rem;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
-            transition: 0.3s;
-        }
-        
-        .glass-card:hover {
-            transform: translateY(-5px);
         }
         
         .nav-link-admin {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 12px 15px;
             border-radius: 12px;
             display: block;
             text-decoration: none;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            transition: 0.3s;
         }
         
         .nav-link-admin.active,
@@ -67,77 +55,163 @@
             background: rgba(255, 255, 255, 0.15);
             color: white;
         }
+        /* Stats & Glass Cards */
         
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
+        .glass-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .badge-role {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: inline-block;
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .role-admin {
+            background: #e0e7ff;
+            color: #4338ca;
+            border: 1px solid #c7d2fe;
+        }
+        
+        .role-student {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .table thead th {
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 15px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
         }
     </style>
 </head>
 
 <body>
+
     <div class="sidebar">
-        <h4 class="fw-bold mb-5"><i class="fas fa-user-shield me-2"></i> Admin Panel</h4>
+        <h4 class="fw-bold mb-5"><i class="fas fa-user-shield me-2"></i> Admin Hub</h4>
         <nav>
-            <a href="{{ url_for('admin') }}" class="nav-link-admin active"><i class="fas fa-chart-line me-2"></i> System Insights</a>
-            <a href="{{ url_for('admin_bulk_screen') }}" class="nav-link-admin"><i class="fas fa-layer-group me-2"></i> Batch Screening</a>
+            <a href="{{ url_for('admin') }}" class="nav-link-admin active">
+                <i class="fas fa-chart-line me-2"></i> Dashboard
+            </a>
+            <a href="{{ url_for('admin_bulk_screen') }}" class="nav-link-admin">
+                <i class="fas fa-layer-group me-2"></i> Batch Screening
+            </a>
             <hr class="opacity-25 my-4">
-            <a href="{{ url_for('logout') }}" class="nav-link-admin text-danger fw-bold"><i class="fas fa-power-off me-2"></i> Logout</a>
+            <a href="{{ url_for('logout') }}" class="nav-link-admin text-danger fw-bold">
+                <i class="fas fa-power-off me-2"></i> Logout
+            </a>
         </nav>
     </div>
 
     <div class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-5">
-            <h2 class="fw-bold m-0">System Analytics</h2>
-            <span class="badge bg-success py-2 px-3 rounded-pill shadow-sm"><i class="fas fa-database me-1"></i> MongoDB Live</span>
+            <div>
+                <h2 class="fw-bold m-0 text-dark">System Analytics</h2>
+                <p class="text-muted small">Real-time overview of CareerPath AI platform</p>
+            </div>
+            <span class="badge bg-success py-2 px-3 rounded-pill shadow-sm">
+                <i class="fas fa-database me-1"></i> Connected to Atlas
+            </span>
         </div>
 
         <div class="row g-4 mb-4">
             <div class="col-md-4">
                 <div class="glass-card text-center">
-                    <div class="stat-icon bg-primary text-white mx-auto"><i class="fas fa-users"></i></div>
-                    <small class="text-muted fw-bold">TOTAL STUDENTS</small>
-                    <h2 class="fw-bold m-0">{{ analytics["users"] }}</h2>
+                    <small class="text-muted fw-bold d-block mb-1">TOTAL ACCOUNTS</small>
+                    <h2 class="fw-bold m-0 text-primary">{{ analytics["users"] }}</h2>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="glass-card text-center">
-                    <div class="stat-icon bg-success text-white mx-auto"><i class="fas fa-file-alt"></i></div>
-                    <small class="text-muted fw-bold">TOTAL SCREENINGS</small>
-                    <h2 class="fw-bold m-0">{{ analytics["resumes"] }}</h2>
+                    <small class="text-muted fw-bold d-block mb-1">TOTAL SCREENINGS</small>
+                    <h2 class="fw-bold m-0 text-success">{{ analytics["resumes"] }}</h2>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="glass-card text-center border-top border-warning border-4">
-                    <div class="stat-icon bg-warning text-dark mx-auto"><i class="fas fa-fire"></i></div>
-                    <small class="text-muted fw-bold">TRENDING FIELD</small>
-                    <h5 class="fw-bold m-0 text-primary">{{ top_career }}</h5>
+                <div class="glass-card text-center">
+                    <small class="text-muted fw-bold d-block mb-1">TRENDING FIELD</small>
+                    <h5 class="fw-bold m-0 text-purple" style="color: var(--admin-purple);">{{ top_career }}</h5>
                 </div>
             </div>
         </div>
 
-        <div class="glass-card">
-            <h5 class="fw-bold mb-4 text-center">Career Recommendation Distribution</h5>
-            <div style="height: 350px;">
-                <canvas id="careerChart"></canvas>
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="glass-card">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-users me-2 text-primary"></i>Registered Candidates</h5>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>User Details</th>
+                                    <th>Role</th>
+                                    <th>Interest</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ user.username }}</div>
+                                        <div class="text-muted small">{{ user.email }}</div>
+                                    </td>
+                                    <td>
+                                        {% if user.role == 'admin' %}
+                                        <span class="badge-role role-admin">ADMIN</span> {% else %}
+                                        <span class="badge-role role-student">STUDENT</span> {% endif %}
+                                    </td>
+                                    <td><span class="text-muted small">{{ user.interest }}</span></td>
+                                    <td><span class="text-success small fw-bold"><i class="fas fa-check-circle me-1"></i> Active</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="glass-card">
+                    <h5 class="fw-bold mb-4 text-center"><i class="fas fa-chart-bar me-2"></i>Career Distribution</h5>
+                    <div class="chart-container">
+                        <canvas id="careerChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const ctx = document.getElementById('careerChart').getContext('2d');
-        const labels = {
+
+        // Pass Python lists directly as JS arrays using |tojson filter
+        const careerLabels = {
             {
                 career_labels | tojson
             }
         };
-        const values = {
+        const careerValues = {
             {
                 career_values | tojson
             }
@@ -146,30 +220,47 @@
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: careerLabels,
                 datasets: [{
-                    label: 'Recommended Students',
-                    data: values,
-                    backgroundColor: 'rgba(74, 20, 140, 0.7)',
+                    label: 'Number of Students',
+                    data: careerValues,
+                    backgroundColor: 'rgba(74, 20, 140, 0.8)', // Admin Purple
                     borderColor: '#4a148c',
                     borderWidth: 1,
-                    borderRadius: 10
+                    borderRadius: 8,
+                    barThickness: 30
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            stepSize: 1
+                            stepSize: 1,
+                            color: '#64748b'
+                        },
+                        grid: {
+                            borderDash: [5, 5],
+                            drawBorder: false
                         }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
+                    },
+                    x: {
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                size: 10
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
                     }
                 }
             }
