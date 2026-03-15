@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - CareerPath AI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
          :root {
             --primary-purple: #764ba2;
@@ -27,6 +27,7 @@
         .login-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 30px;
             padding: 3rem;
@@ -63,28 +64,28 @@
             background: white;
             color: var(--primary-purple);
         }
-        /* CRITICAL FIX: Forces dark text for ALL inputs */
+        
+        .pass-group {
+            position: relative;
+        }
+        
+        .toggle-icon {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #718096;
+            cursor: pointer;
+            z-index: 10;
+        }
         
         .form-control {
             background: rgba(255, 255, 255, 0.95) !important;
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: #212529 !important;
-            /* Deep dark grey for visibility */
             border-radius: 12px;
             padding: 12px;
-            margin-bottom: 1rem;
-        }
-        /* Ensures text stays dark even when clicked */
-        
-        .form-control:focus {
-            background: #ffffff !important;
-            color: #000000 !important;
-            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.2);
-            outline: none;
-        }
-        
-        .form-control::placeholder {
-            color: #6c757d !important;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
         }
         
         .btn-login {
@@ -96,7 +97,26 @@
             font-weight: 800;
             width: 100%;
             text-transform: uppercase;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            background: #f8f9fa;
+        }
+        
+        .forgot-link {
+            text-decoration: none;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            transition: 0.3s;
+        }
+        
+        .forgot-link:hover {
+            color: white;
         }
     </style>
 </head>
@@ -104,15 +124,16 @@
 <body>
     <div class="login-card">
         <div class="text-center mb-4">
-            <h2 class="fw-bold"><i class="fas fa-fingerprint me-2"></i> CareerPath AI</h2>
-            <p class="small opacity-75">Sign in to your portal</p>
+            <h2 class="fw-bold"><i class="fas fa-lock me-2"></i> Login Portal</h2>
+            <p class="small opacity-75">Welcome back to CareerPath AI</p>
         </div>
 
-        {% if error %}
-        <div class="alert alert-danger py-2 small text-center" style="border-radius: 10px;">
-            {{ error }}
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show text-center py-2 border-0 shadow-sm" role="alert">
+            <small class="fw-bold">{{ message }}</small>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        {% endif %}
+        {% endfor %} {% endif %} {% endwith %}
 
         <form action="{{ url_for('login') }}" method="POST">
             <div class="role-switcher">
@@ -127,18 +148,38 @@
                 <input type="text" name="username" class="form-control" placeholder="Enter Username" required>
             </div>
 
-            <div class="mb-3">
+            <div class="mb-2 pass-group">
                 <label class="small fw-bold mb-1">Password</label>
-                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+                <i class="fas fa-eye toggle-icon" onclick="togglePass()"></i>
+            </div>
+
+            <div class="text-end">
+                <a href="{{ url_for('forgot_password') }}" class="forgot-link">Forgot Password?</a>
             </div>
 
             <button type="submit" class="btn btn-login">Access Portal</button>
         </form>
 
         <div class="text-center mt-4 small">
-            New candidate? <a href="{{ url_for('register') }}" class="text-white fw-bold">Join Now</a>
+            New candidate? <a href="{{ url_for('register') }}" class="text-white fw-bold text-decoration-none">Join Now</a>
         </div>
     </div>
+
+    <script>
+        function togglePass() {
+            const passInput = document.getElementById('password');
+            const icon = event.target;
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passInput.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

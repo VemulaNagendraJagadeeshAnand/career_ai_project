@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
          :root {
-            --primary-color: #4f46e5;
-            /* Indigo */
+            --primary-color: #764ba2;
+            /* Matches your purple theme */
             --bg-light: #f8fafc;
             --sidebar-bg: #1e293b;
             --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
@@ -31,6 +31,7 @@
             padding: 2rem 1.5rem;
             display: flex;
             flex-direction: column;
+            z-index: 1000;
         }
         
         .nav-link-student {
@@ -40,6 +41,7 @@
             display: block;
             text-decoration: none;
             margin-bottom: 5px;
+            transition: 0.3s;
         }
         
         .nav-link-student:hover,
@@ -63,11 +65,10 @@
             margin-bottom: 20px;
         }
         
-        .btn-primary {
-            background: var(--primary-color);
+        .alert {
+            border-radius: 10px;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            margin-bottom: 20px;
         }
         
         .badge-ats {
@@ -92,6 +93,13 @@
     </div>
 
     <div class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %} {% endif %} {% endwith %}
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold">Student Dashboard</h2>
             <div class="text-end">
@@ -103,7 +111,7 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="card text-center">
-                    <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=4f46e5&color=fff" class="rounded-circle mx-auto mb-3" width="80">
+                    <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=764ba2&color=fff" class="rounded-circle mx-auto mb-3" width="80">
                     <h5>{{ user.interest }}</h5>
                     <p class="text-muted small">Primary Interest</p>
                 </div>
@@ -111,28 +119,36 @@
             <div class="col-md-8">
                 <div class="card">
                     <h5 class="fw-bold mb-3">Recent Activity</h5>
-                    <table class="table table-borderless">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Date</th>
-                                <th>Career Match</th>
-                                <th>Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for entry in history|reverse %}
-                            <tr>
-                                <td>{{ entry.timestamp }}</td>
-                                <td><strong>{{ entry.career }}</strong></td>
-                                <td><span class="badge-ats">{{ entry.ats }}%</span></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Career Match</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if history %} {% for entry in history|reverse %}
+                                <tr>
+                                    <td>{{ entry.timestamp }}</td>
+                                    <td><strong>{{ entry.career }}</strong></td>
+                                    <td><span class="badge-ats">{{ entry.ats }}%</span></td>
+                                </tr>
+                                {% endfor %} {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">No recent activity found. Start a screening to see results!</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

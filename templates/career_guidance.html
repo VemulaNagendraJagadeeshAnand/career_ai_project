@@ -23,7 +23,7 @@
             margin: 0;
             min-height: 100vh;
         }
-        /* Sidebar */
+        /* Sidebar Styling */
         
         .sidebar {
             width: 260px;
@@ -33,6 +33,7 @@
             padding: 2rem 1.5rem;
             display: flex;
             flex-direction: column;
+            z-index: 1000;
         }
         
         .nav-link-student {
@@ -64,6 +65,12 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
             padding: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
             margin-bottom: 25px;
         }
         
@@ -125,6 +132,13 @@
     </div>
 
     <div class="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %} {% endif %} {% endwith %}
+
         <h2 class="fw-bold mb-4">Smart Career Navigator</h2>
 
         <div class="card">
@@ -150,13 +164,17 @@
                     <div class="col-md-6">
                         <p class="small text-muted fw-bold mb-2">YOU ALREADY HAVE:</p>
                         <div class="d-flex flex-wrap">
-                            {% for m in data.matches %} <span class="skill-badge match">{{ m }}</span> {% endfor %} {% if not data.matches %}<span class="text-muted small">No matches found.</span>{% endif %}
+                            {% for m in data.matches %}
+                            <span class="skill-badge match">{{ m }}</span> {% endfor %} {% if not data.matches %}
+                            <span class="text-muted small">No matches found.</span> {% endif %}
                         </div>
                     </div>
                     <div class="col-md-6">
                         <p class="small text-muted fw-bold mb-2">SKILLS TO ACQUIRE:</p>
                         <div class="d-flex flex-wrap">
-                            {% for mis in data.missing %} <span class="skill-badge miss">{{ mis }}</span> {% endfor %} {% if not data.missing %}<span class="text-success small">Perfect match!</span>{% endif %}
+                            {% for mis in data.missing %}
+                            <span class="skill-badge miss">{{ mis }}</span> {% endfor %} {% if not data.missing %}
+                            <span class="text-success small">Perfect match!</span> {% endif %}
                         </div>
                     </div>
                 </div>
@@ -166,6 +184,8 @@
         </div>
         {% endif %}
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
